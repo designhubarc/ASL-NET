@@ -15,11 +15,9 @@ CATEGORIES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
 """
 
 """
-
     Post the data base as a zip file to media fire or drive and then
     write a download tool to download and unzip the database into a user desired
     directory.
-
 """
 
 class Dataset:
@@ -73,11 +71,7 @@ class Dataset:
 
     """
         TO-DO: 
-
-        Make 3 generate_batch functions for each type (train, test, val)
-
-        Where is epoch incremented?
-
+        Inside asl_net.py, Make a CNN following the tensorflow tutorial
 
     """
 
@@ -88,12 +82,18 @@ class Dataset:
         is same as number of batches, a reshuffle is applied for the next epoch.
         """
 
-        batch = np.zeros((self.batch_size, 200, 200, 3), dtype=np.float32) # 200x200 RGB images
+        batch_imgs = np.zeros((self.batch_size, 200, 200, 3), dtype=np.float32) # 200x200 RGB images
+        batch_labels = []
+
+        # Batch starts at the last batch's end, to make sure we do not reuse images
         start = self.current_train_batch * self.batch_size
         end = (self.current_train_batch+1) * self.batch_size
+
         index = 0
-        for x in range(start, end): # make sure we do not reuse images
-            batch[index] = mpimg.imread(self.train_image_array[x])
+        for x in range(start, end): 
+            batch_imgs[index] = mpimg.imread(self.train_image_array[x])
+            # Append letter from image name so that image is labeled 
+            batch_labels.append(self.train_image_array[x][self.train_image_array[x].rfind("\\") + 1]) 
             index += 1
 
         #increment batch
@@ -102,22 +102,28 @@ class Dataset:
         if self.current_train_batch == self.train_number_of_batches:
             np.random.shuffle(self.train_image_array) 
 
-        return batch
+        return batch_imgs, np.array(batch_labels)
 
     def generate_test_batch(self): 
 
-        batch = np.zeros((self.batch_size, 200, 200, 3), dtype=np.float32) # 200x200 RGB images
+        batch_imgs = np.zeros((self.batch_size, 200, 200, 3), dtype=np.float32) # 200x200 RGB images
+        batch_labels = []
+
+        # Batch starts at the last batch's end, to make sure we do not reuse images
         start = self.current_test_batch * self.batch_size
         end = (self.current_test_batch+1) * self.batch_size
+
         index = 0
         for x in range(start, end): # make sure we do not reuse images
-            batch[index] = mpimg.imread(self.test_image_array[x])
+            batch_imgs[index] = mpimg.imread(self.test_image_array[x])
+            # Append letter from image name so that image is labeled 
+            batch_labels.append(self.test_image_array[x][self.test_image_array[x].rfind("\\") + 1]) 
             index += 1
 
         # increment batch
         self.current_test_batch += 1
         # no shuffle 
-        return batch
+        return batch_imgs, np.array(batch_labels)
 
     def generate_val_batch(self): 
         """
@@ -125,12 +131,18 @@ class Dataset:
         Recognize when no more batches to make?
         """
         # Make np array of 200x200 RGB images, filled with zeros
-        batch = np.zeros((self.batch_size, 200, 200, 3), dtype=np.float32) 
+        batch_imgs = np.zeros((self.batch_size, 200, 200, 3), dtype=np.float32) # 200x200 RGB images
+        batch_labels = []
+
+        # Batch starts at the last batch's end, to make sure we do not reuse images
         start = self.current_val_batch * self.batch_size
         end = (self.current_val_batch+1) * self.batch_size
+
         index = 0
         for x in range(start, end): # make sure we do not reuse images
-            batch[index] = mpimg.imread(self.val_image_array[x])
+            batch_imgs[index] = mpimg.imread(self.val_image_array[x])
+            # Append letter from image name so that image is labeled 
+            batch_labels.append(self.val_image_array[x][self.val_image_array[x].rfind("\\") + 1]) 
             index += 1
             
         #increment batch
@@ -139,18 +151,17 @@ class Dataset:
         if self.current_val_batch == self.val_test_number_of_batches:
             np.random.shuffle(self.val_image_array) 
             
-        return batch
+        return batch_imgs, np.array(batch_labels)
     
 
 if __name__ == '__main__':
     # TESTING
     dataset_directory = str(sys.argv[1])
     dataset = Dataset(dataset_directory, 40)
-    train_batch = dataset.generate_train_batch()
-    train_batch = dataset.generate_train_batch()
-    test_batch = dataset.generate_test_batch()
-    test_batch = dataset.generate_test_batch()
     val_batch = dataset.generate_val_batch()
-    val_batch = dataset.generate_val_batch()
-
-    print(test_batch[5])
+    test_batch = dataset.generate_test_batch()
+    train_batch = dataset.generate_train_batch()
+    # Output labels
+    print(train_batch[1])
+    print(test_batch[1])
+    print(val_batch[1])
