@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.image as mpimg # for reading images as numpy arrays
-import tensorflow as tf
 import os
 import random
 import sys
@@ -77,9 +76,8 @@ class Dataset:
 
     def generate_train_batch(self): 
         """
-        Takes train numpy array and returns a numpy array containing image data
-        of a full batch. Each batch increments current_batch. When current_batch
-        is same as number of batches, a reshuffle is applied for the next epoch.
+        Returns two parallel numpy arrays: one for image data and one for 
+        indexes of CATEGORIES
         """
 
         batch_imgs = np.zeros((self.batch_size, 200, 200, 3), dtype=np.float32) # 200x200 RGB images
@@ -92,8 +90,10 @@ class Dataset:
         index = 0
         for x in range(start, end): 
             batch_imgs[index] = mpimg.imread(self.train_image_array[x])
-            # Append letter from image name so that image is labeled 
-            batch_labels.append(self.train_image_array[x][self.train_image_array[x].rfind("\\") + 1]) 
+            # Get letter from image name 
+            label = self.train_image_array[x][self.train_image_array[x].rfind("\\") + 1] 
+            # Append letter index
+            batch_labels.append(CATEGORIES.index(label))
             index += 1
 
         #increment batch
@@ -105,7 +105,10 @@ class Dataset:
         return batch_imgs, np.array(batch_labels)
 
     def generate_test_batch(self): 
-
+        """
+        Returns two parallel numpy arrays: one for image data and one for 
+        indexes of CATEGORIES
+        """
         batch_imgs = np.zeros((self.batch_size, 200, 200, 3), dtype=np.float32) # 200x200 RGB images
         batch_labels = []
 
@@ -116,8 +119,10 @@ class Dataset:
         index = 0
         for x in range(start, end): # make sure we do not reuse images
             batch_imgs[index] = mpimg.imread(self.test_image_array[x])
-            # Append letter from image name so that image is labeled 
-            batch_labels.append(self.test_image_array[x][self.test_image_array[x].rfind("\\") + 1]) 
+            # Get letter from image name 
+            label = self.test_image_array[x][self.test_image_array[x].rfind("\\") + 1] 
+            # Append letter index
+            batch_labels.append(CATEGORIES.index(label))
             index += 1
 
         # increment batch
@@ -127,8 +132,8 @@ class Dataset:
 
     def generate_val_batch(self): 
         """
-        Todo:
-        Recognize when no more batches to make?
+        Returns two parallel numpy arrays: one for image data and one for 
+        indexes of CATEGORIES
         """
         # Make np array of 200x200 RGB images, filled with zeros
         batch_imgs = np.zeros((self.batch_size, 200, 200, 3), dtype=np.float32) # 200x200 RGB images
@@ -141,8 +146,10 @@ class Dataset:
         index = 0
         for x in range(start, end): # make sure we do not reuse images
             batch_imgs[index] = mpimg.imread(self.val_image_array[x])
-            # Append letter from image name so that image is labeled 
-            batch_labels.append(self.val_image_array[x][self.val_image_array[x].rfind("\\") + 1]) 
+            # Get letter from image name 
+            label = self.val_image_array[x][self.val_image_array[x].rfind("\\") + 1] 
+            # Append letter index
+            batch_labels.append(CATEGORIES.index(label))
             index += 1
             
         #increment batch
