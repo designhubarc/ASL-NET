@@ -1,6 +1,7 @@
 import dispatcher
 import tensorflow as tf
-from tensorflow import keras
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense
 import matplotlib.pyplot as plt
 import sys
 
@@ -15,19 +16,19 @@ if __name__ == "__main__":
     dataset = dispatcher.Dataset(dataset_directory, batch_size) 
 
     # Get test images and labels
-    (test_images, test_labels) = dataset.generate_test_batch()
+    (test_x, test_y) = dataset.generate_test_batch()
     # Get train images and labels
-    (train_images, train_labels) = dataset.generate_train_batch()
+    (train_x, train_y) = dataset.generate_train_batch()
     # Get val images and labels
-    (val_images, val_labels) = dataset.generate_val_batch()
+    (val_x, val_y) = dataset.generate_val_batch()
 
 
-    # scale for neural network
-    train_images = train_images / 255.0
-    test_images = test_images / 255.0
-    val_images = val_images / 255.0
+    # scale/normalize RGB values for neural network
+    train_x = train_x / 255.0
+    test_x = test_x / 255.0
+    val_x = val_x / 255.0
 
-    # Successfully displays images from numpy array train_images with labels
+    # Successfully displays images from numpy array train_x with labels
     """
     plt.figure(figsize=(10,10))
     for i in range(25):
@@ -35,21 +36,35 @@ if __name__ == "__main__":
         plt.xticks([])
         plt.yticks([])
         plt.grid(False)
-        plt.imshow(train_images[i], cmap=plt.cm.binary)
-        plt.xlabel(dispatcher.CATEGORIES[train_labels[i]])
+        plt.imshow(train_x[i], cmap=plt.cm.binary)
+        plt.xlabel(dispatcher.CATEGORIES[train_y[i]])
     plt.show()
     """
 
     # Create model
-    model = keras.Sequential([
-        keras.layers.Conv2D(40, (3, 3), input_shape = (3, 200, 200))
-        keras.layers.Flatten(input_shape=(3, 200, 200)),
-        keras.layers.Dense(128, activation='relu'),
-        keras.layers.Dense(26) # 26 alphabet letters
-    ])
+    model = Sequential()
+    # Images are 200x200, with 3 channels (RGB)
 
-    model.compile(optimizer='adam',
-                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                  metrics=['accuracy'])
+    # 2D convolutional network with 5x5 filter
+    model.add(Conv2D(64, (5, 5), input_shape = (200, 200, 3)))
+    model.add(Activation("relu"))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+
+    model.add(Conv2D(64, (5, 5)))
+    model.add(Activation("relu"))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+
+    model.add(Flatten())
+    model.add(Dense(batch_size))
+
+    # 26 alphabet letters
+    model.add(Dense(26))
+    model.add(Activation('sigmoid'))
+
+    model.compile(loss="sparse_categorical_crossentropy",
+                  optimizer='adam',
+                  metrics=['sparse_categorical_accuracy'])
     
-    model.fit(train_images, train_labels, epochs=1)
+    model.fit(train_x, train_y, 
+              batch_size=dataset.batch_size, 
+              validation_data=(val_x, val_y))
