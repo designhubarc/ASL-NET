@@ -4,7 +4,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout
 import matplotlib.pyplot as plt
 import sys
-import tqdm # prettier loops
+from tqdm import tqdm # prettier loops
 
 
 # Running Tensorflow 2.0.0
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     batch_size = int(sys.argv[2])
 
     # handle on our dataset
-    dataset = dispatcher.Dataset(dataset_directory, batch_size) 
+    dataset = dispatcher.Dataset(dataset_directory, batch_size)
 
     # # Get test images and labels
     # (test_x, test_y) = dataset.generate_test_batch()
@@ -78,4 +78,5 @@ if __name__ == "__main__":
             train_photos = train_photos / 255.0 # standardize RGB values between 0-1
 
             loss = model.train_on_batch(train_photos, train_labels)
-            print("Epoch " + dataset.current_epoch + " - Loss: " + str(loss))
+            print("Epoch " + dataset.current_epoch + " - Loss: ")
+            print(loss)
