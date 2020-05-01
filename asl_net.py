@@ -28,8 +28,8 @@ if __name__ == "__main__":
     test_x = test_x / 255.0
     val_x = val_x / 255.0
 
-    # Successfully displays images from numpy array train_x with labels
     """
+    # Successfully displays images from numpy array train_x with labels
     plt.figure(figsize=(10,10))
     for i in range(25):
         plt.subplot(5,5,i+1)
@@ -64,7 +64,15 @@ if __name__ == "__main__":
     model.compile(loss="sparse_categorical_crossentropy",
                   optimizer='adam',
                   metrics=['sparse_categorical_accuracy'])
-    
+
+    # Train on multiple batches
+    while (dataset.current_train_batch < dataset.train_number_of_batches):
+        model.train_on_batch(train_x, train_y)
+        print(dataset.current_train_batch)
+        (train_x, train_y) = dataset.generate_train_batch()
+
+    """ 
     model.fit(train_x, train_y, 
               batch_size=dataset.batch_size, 
               validation_data=(val_x, val_y))
+    """
