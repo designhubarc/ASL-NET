@@ -62,6 +62,7 @@ if __name__ == "__main__":
         total_predictions = 0
         for step in tqdm(range(dataset.val_test_number_of_batches), desc = "Validating Model"): # lets load all in memory then evaluate in test mode for validation
                 (val_photos, val_labels) = dataset.generate_val_batch() # get next batch of val images
+                val_photos = val_photos / 255.0 # standardize RGB values between 0-1
                 predictions = model.predict_on_batch(val_photos)
 
                 # go through and see which predictions are correct
