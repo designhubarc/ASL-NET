@@ -23,6 +23,9 @@ class Dataset:
 
     def __init__(self, directory, batch_size):
 
+        self.shape = (64,64,3) # 64 x 64 colored images
+        self.classifications = 26
+
         # Directories for train, test, and validation images
         self.train_dir = os.path.join(directory, "train")
         self.test_dir = os.path.join(directory, "test")
@@ -41,7 +44,7 @@ class Dataset:
 
         # current number of cycles through training dataset
         self.current_epoch = 0
-        self.epoch_threshold = 20 # arbitrary value for now
+        self.epoch_threshold = 65 # arbitrary value for now
 
         # Shuffled list of all randomized images for batch
         # These are numpy arrays that are not static
@@ -80,7 +83,7 @@ class Dataset:
         indexes of CATEGORIES
         """
 
-        batch_images = np.zeros((self.batch_size, 64, 64, 3), dtype=np.float32) # 200x200 RGB images
+        batch_images = np.zeros((self.batch_size, self.shape[0], self.shape[1], self.shape[2]), dtype=np.float32) # 200x200 RGB images
         batch_labels = []
 
         # Batch starts at the last batch's end, to make sure we do not reuse images
@@ -111,7 +114,7 @@ class Dataset:
         Returns two parallel numpy arrays: one for image data and one for
         indexes of CATEGORIES
         """
-        batch_images = np.zeros((self.batch_size, 64, 64, 3), dtype=np.float32) # 200x200 RGB images
+        batch_images = np.zeros((self.batch_size, self.shape[0], self.shape[1], self.shape[2]), dtype=np.float32) # 200x200 RGB images
         batch_labels = []
 
         # Batch starts at the last batch's end, to make sure we do not reuse images
@@ -138,7 +141,7 @@ class Dataset:
         indexes of CATEGORIES
         """
         # Make np array of 200x200 RGB images, filled with zeros
-        batch_images = np.zeros((self.batch_size, 64, 64, 3), dtype=np.float32) # 200x200 RGB images
+        batch_images = np.zeros((self.batch_size, self.shape[0], self.shape[1], self.shape[2]), dtype=np.float32) # 200x200 RGB images
         batch_labels = []
 
         # Batch starts at the last batch's end, to make sure we do not reuse images

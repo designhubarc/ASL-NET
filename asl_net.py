@@ -12,6 +12,13 @@ import numpy as np
 
 if __name__ == "__main__":
 
+    # get directory and batch size
+    dataset_directory = str(sys.argv[1])
+    batch_size = int(sys.argv[2])
+
+    # handle on our dataset
+    dataset = dispatcher.Dataset(dataset_directory, batch_size)
+
     # Create model
     model = Sequential()
     # Images are 64x64, with 3 channels (RGB)
@@ -32,19 +39,12 @@ if __name__ == "__main__":
     model.add(Dense(1000, activation='relu'))
 
     # 26 alphabet letters
-    model.add(Dense(26))
+    model.add(Dense(dataset.classifications))
     model.add(Activation('softmax'))
 
     model.compile(loss="sparse_categorical_crossentropy",
                   optimizer='adam',
                   metrics=['accuracy'])
-
-    # handle dataset
-    dataset_directory = str(sys.argv[1])
-    batch_size = int(sys.argv[2])
-
-    # handle on our dataset
-    dataset = dispatcher.Dataset(dataset_directory, batch_size)
 
     # Train and validate network
     while(dataset.current_epoch < dataset.epoch_threshold): # go for some number of epochs
@@ -72,4 +72,21 @@ if __name__ == "__main__":
 
                 total_predictions += batch_size # we predict batch size at a time
 
-        print("Validation Accuracy: " + str(num_correct/total_predictions))
+        print("Correct = " + str(num_correct) + ", Total Predictions = " + str(total_predictions) + ", Validation Accuracy = " + str(float(num_correct)/float(total_predictions)))
+
+    # Test set
+    num_correct = 0
+    total_predictions = 0
+    for step in tqdm(range(dataset.val_test_number_of_batches), desc = "Testing Model"):
+        (test_photos, test_labels) = dataset.generate_test_batch()
+        test_photos = test_photos / 255.0 # standardize RGB values
+        predictions = model.predict_on_batch(test_photos)
+
+        # go through and see which predictions are correct
+        for i in range(batch_size):
+            if test_labels[i] == np.argmax(predictions[i]):
+                num_correct += 1
+
+        total_predictions += batch_size # we predict batch size at a time
+
+print("Correct = " + str(num_correct) + ", Total Predictions = " + str(total_predictions) + ", Validation Accuracy = " + str(float(num_correct)/float(total_predictions)))
