@@ -89,4 +89,4 @@ if __name__ == "__main__":
 
         total_predictions += batch_size # we predict batch size at a time
 
-print("Correct = " + str(num_correct) + ", Total Predictions = " + str(total_predictions) + ", Validation Accuracy = " + str(float(num_correct)/float(total_predictions)))
+    print("Correct = " + str(num_correct) + ", Total Predictions = " + str(total_predictions) + ", Validation Accuracy = " + str(float(num_correct)/float(total_predictions)))
