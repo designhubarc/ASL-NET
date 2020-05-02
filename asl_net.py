@@ -10,15 +10,7 @@ import numpy as np
 
 # Running Tensorflow 2.1.0
 
-if __name__ == "__main__":
-
-    # get directory and batch size
-    dataset_directory = str(sys.argv[1])
-    batch_size = int(sys.argv[2])
-
-    # handle on our dataset
-    dataset = dispatcher.Dataset(dataset_directory, batch_size)
-
+def BuildNetwork(dataset):
     # Create model
     model = Sequential()
     # Images are 64x64, with 3 channels (RGB)
@@ -46,6 +38,10 @@ if __name__ == "__main__":
                   optimizer='adam',
                   metrics=['accuracy'])
 
+    return model
+
+
+def TrainAndValidateNetwork(model, dataset):
     # Train and validate network
     while(dataset.current_epoch < dataset.epoch_threshold): # go for some number of epochs
         # train
@@ -73,7 +69,10 @@ if __name__ == "__main__":
                 total_predictions += batch_size # we predict batch size at a time
 
         print("Correct = " + str(num_correct) + ", Total Predictions = " + str(total_predictions) + ", Validation Accuracy = " + str(float(num_correct)/float(total_predictions)))
+    return model
 
+
+def TestNetwork(model, dataset):
     # Test set
     num_correct = 0
     total_predictions = 0
@@ -90,3 +89,19 @@ if __name__ == "__main__":
         total_predictions += batch_size # we predict batch size at a time
 
     print("Correct = " + str(num_correct) + ", Total Predictions = " + str(total_predictions) + ", Validation Accuracy = " + str(float(num_correct)/float(total_predictions)))
+
+
+if __name__ == "__main__":
+
+    # get directory and batch size
+    dataset_directory = str(sys.argv[1])
+    batch_size = int(sys.argv[2])
+    file_path = str(sys.argv[3]) # complete file path to save the trained model. File path must be to an hdf5 file.ex: C:\Users\Bob\my_model.hdf5
+
+    dataset = dispatcher.Dataset(dataset_directory, batch_size) # handle on our dataset
+
+    model = BuildNetwork(dataset) # build network
+    model = TrainAndValidateNetwork(model, dataset) # training and validation for each epoch
+    TestNetwork(model, dataset) # run the network on the test set
+
+    model.save(file_path) # save the model
