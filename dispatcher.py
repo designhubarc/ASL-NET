@@ -34,8 +34,8 @@ class Dataset:
         # Default batch size
         self.batch_size = batch_size
         # total number of batches
-        self.train_number_of_batches = 2600 // self.batch_size
-        self.val_test_number_of_batches = 200 // self.batch_size
+        self.train_number_of_batches = 2600*26 // self.batch_size
+        self.val_test_number_of_batches = 200*26 // self.batch_size
 
         # current number of batches processed
         self.current_train_batch = 0
