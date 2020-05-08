@@ -72,7 +72,7 @@ def getTrainImagesOutOfOrder(test_dir):
     return image_array, np.array(image_labels)
 
 if __name__ == '__main__':
-    test_di = sys.argv[1]
+    test_dir = sys.argv[1]
     model_dir = sys.argv[2]
 
     model = keras.models.load_model(model_dir)

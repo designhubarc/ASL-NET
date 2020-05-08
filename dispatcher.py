@@ -44,7 +44,7 @@ class Dataset:
 
         # current number of cycles through training dataset
         self.current_epoch = 0
-        self.epoch_threshold = 65 # arbitrary value for now
+        self.epoch_threshold = 25 # arbitrary value for now
 
         # Shuffled list of all randomized images for batch
         # These are numpy arrays that are not static
