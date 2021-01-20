@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import sys
 from tqdm import tqdm # prettier loops
 import numpy as np
+import matplotlib.image as mpimg # for reading images as numpy arrays when in test mode
+import os # used in test mode
 
 
 # Running Tensorflow 2.1.0
@@ -94,14 +96,31 @@ def TestNetwork(model, dataset):
 if __name__ == "__main__":
 
     # get directory and batch size
-    dataset_directory = str(sys.argv[1])
-    batch_size = int(sys.argv[2])
+    dataset_directory = str(sys.argv[1]) # in train mode, it will be a path to a dir with train/ test/ val/.. in test mode it is a directory of images (images are expected to be set to 64x64 rgb)
+    batch_size = int(sys.argv[2]) 
     file_path = str(sys.argv[3]) # complete file path to save the trained model. File path must be to an hdf5 file.ex: C:\Users\Bob\my_model.hdf5
 
-    dataset = dispatcher.Dataset(dataset_directory, batch_size) # handle on our dataset
+    if (len(sys.argv) == 5 and str(sys.argv[4]) == "test"):
+        model = tf.keras.models.load_model(file_path) # load trained model
+        images = os.listdir(dataset_directory) # list of all images
+        numOfBatches = len(images) / batch_size if len(images) % batch_size == 0 else len(images) / batch_size + 1
+        for j in range(int(numOfBatches)):
+            if j == int(numOfBatches)-1:
+                batch_images = np.zeros((len(images) - j*batch_size, 64, 64, 3), dtype=np.float32) # 200x200 RGB images
+                for i in range(len(images) - j*batch_size):
+                        batch_images[i] = mpimg.imread(os.path.join(dataset_directory,images[j*batch_size + i])) # get the images 1 by 1
+            else:
+                batch_images = np.zeros((batch_size, 64, 64, 3), dtype=np.float32) # 200x200 RGB images
+                for i in range(batch_size):
+                    batch_images[i] = mpimg.imread(os.path.join(dataset_directory,images[j*batch_size + i])) # get the images 1 by 1
+            predictions = model.predict_on_batch(batch_images) # get predictions
+            for p in predictions:
+                print(p) # for now we will just print the predictions
+    else:
+        dataset = dispatcher.Dataset(dataset_directory, batch_size) # handle on our dataset
 
-    model = BuildNetwork(dataset) # build network
-    model = TrainAndValidateNetwork(model, dataset) # training and validation for each epoch
-    TestNetwork(model, dataset) # run the network on the test set
+        model = BuildNetwork(dataset) # build network
+        model = TrainAndValidateNetwork(model, dataset) # training and validation for each epoch
+        TestNetwork(model, dataset) # run the network on the test set
 
-    model.save(file_path) # save the model
+        model.save(file_path) # save the model
