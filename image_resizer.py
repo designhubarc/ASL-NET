@@ -10,8 +10,8 @@ from PIL import Image
 """
 
 def Resize(img_dir, output_dir, new_length, new_width):
-    print(img_dir + " " + output_dir)
-    print(os.listdir(img_dir))
+    #print(img_dir + " " + output_dir)
+    #print(os.listdir(img_dir))
 
     if not os.path.isdir(output_dir): # make dir if needed
         os.mkdir(output_dir)
