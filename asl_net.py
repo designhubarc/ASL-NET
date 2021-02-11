@@ -1,4 +1,4 @@
-import dispatcher
+import dispatcher, image_resizer
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout
@@ -104,18 +104,26 @@ if __name__ == "__main__":
         model = tf.keras.models.load_model(file_path) # load trained model
         images = os.listdir(dataset_directory) # list of all images
         numOfBatches = len(images) / batch_size if len(images) % batch_size == 0 else len(images) / batch_size + 1
+        
+        # go through each batch
         for j in range(int(numOfBatches)):
             if j == int(numOfBatches)-1:
                 batch_images = np.zeros((len(images) - j*batch_size, 64, 64, 3), dtype=np.float32) # 200x200 RGB images
                 for i in range(len(images) - j*batch_size):
-                        batch_images[i] = mpimg.imread(os.path.join(dataset_directory,images[j*batch_size + i])) # get the images 1 by 1
+                    batch_images[i] = mpimg.imread(os.path.join(dataset_directory,images[j*batch_size + i])) # get the images 1 by 1
             else:
                 batch_images = np.zeros((batch_size, 64, 64, 3), dtype=np.float32) # 200x200 RGB images
                 for i in range(batch_size):
                     batch_images[i] = mpimg.imread(os.path.join(dataset_directory,images[j*batch_size + i])) # get the images 1 by 1
+            
             predictions = model.predict_on_batch(batch_images) # get predictions
+            
+            # print the results
+            i = 0
             for p in predictions:
-                print(p) # for now we will just print the predictions
+                print('Image Name: ' + images[j*batch_size + i], end=' ') # for now we will just print the predictions
+                print('Prediction: ' + chr(65 + np.argmax(p)))
+                i += 1
     else:
         dataset = dispatcher.Dataset(dataset_directory, batch_size) # handle on our dataset
 
