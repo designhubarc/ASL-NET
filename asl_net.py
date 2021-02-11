@@ -73,7 +73,7 @@ def TrainAndValidateNetwork(model, dataset):
         print("Correct = " + str(num_correct) + ", Total Predictions = " + str(total_predictions) + ", Validation Accuracy = " + str(float(num_correct)/float(total_predictions)))
     return model
 
-
+# later will be renamed to TestTrainingNetwork, to specify this happens during training
 def TestNetwork(model, dataset):
     # Test set
     num_correct = 0
@@ -102,6 +102,7 @@ if __name__ == "__main__":
 
     if (len(sys.argv) == 5 and str(sys.argv[4]) == "test"):
         model = tf.keras.models.load_model(file_path) # load trained model
+        image_resizer.Resize(dataset_directory, dataset_directory, 64, 64) # resize images to test them
         images = os.listdir(dataset_directory) # list of all images
         numOfBatches = len(images) / batch_size if len(images) % batch_size == 0 else len(images) / batch_size + 1
         
