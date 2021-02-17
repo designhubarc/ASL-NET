@@ -101,12 +101,15 @@ if __name__ == "__main__":
     batch_size = int(sys.argv[2]) 
     file_path = str(sys.argv[3]) # complete file path to save the trained model. File path must be to an hdf5 file.ex: C:\Users\Bob\my_model.hdf5
 
-    if (len(sys.argv) == 5 and str(sys.argv[4]) == "test"):
+    # 4 arguments means testmode, 4th argument is a dir to save the pdf results
+    if (len(sys.argv) == 5):
         model = tf.keras.models.load_model(file_path) # load trained model
         image_resizer.Resize(dataset_directory, dataset_directory, 64, 64) # resize images to test them
         images = os.listdir(dataset_directory) # list of all images
         numOfBatches = len(images) / batch_size if len(images) % batch_size == 0 else len(images) / batch_size + 1
-        output_pdf_path = os.path.join(os.path.dirname(os.getcwd()),'aslnet_results.pdf') # full path to where we hold the output pdf.. (later on will need names to account for potentially multiple users)
+        
+        
+        output_pdf_path = str(sys.argv[4]) # full path to where we hold the output pdf.. (later on will need names to account for potentially multiple users)
         output_pdf = fitz.open() # pdf handle
         cur_page = output_pdf.newPage() # insert first page
         
