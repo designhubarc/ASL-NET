@@ -101,7 +101,7 @@ if __name__ == "__main__":
     batch_size = int(sys.argv[2]) 
     file_path = str(sys.argv[3]) # complete file path to save the trained model. File path must be to an hdf5 file.ex: C:\Users\Bob\my_model.hdf5
 
-    # 4 arguments means testmode, 4th argument is a dir to save the pdf results
+    # 4 arguments means testmode, 4th argument is a full path with file name to save the pdf results
     if (len(sys.argv) == 5):
         model = tf.keras.models.load_model(file_path) # load trained model
         image_resizer.Resize(dataset_directory, dataset_directory, 64, 64) # resize images to test them
